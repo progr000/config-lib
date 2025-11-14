@@ -14,7 +14,7 @@ class ConfigDriverTest extends _BaseTestCase
      */
     public function testGetInstance()
     {
-        $instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . 'config');
+        $instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . "config/main.php");
         $this->assertInstanceOf('Maksym\Config\ConfigDriver', $instance);
     }
 

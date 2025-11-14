@@ -19,6 +19,6 @@ abstract class _BaseTestCase extends TestCase
      */
     public static function setUpBeforeClass()
     {
-        self::$config_instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . 'config');
+        self::$config_instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . "config/main.php");
     }
 }
