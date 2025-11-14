@@ -10,33 +10,54 @@ class ConfigDriver
     private static $instance;
     /** @var stdClass */
     private $container;
+    /** @var array */
+    private $loaded_storage = array();
 
     /**
+     * @param string|null $config_file
      * @return ConfigDriver
      * @throws ConfigException
      */
-    public static function getInstance($config_dir)
+    public static function getInstance($config_file = null)
     {
         if (self::$instance === null) {
-            self::$instance = new self($config_dir);
+            self::$instance = new self();
         }
+
+        if (!is_null($config_file)) {
+            self::$instance->loadConfigFile($config_file);
+        }
+
         return self::$instance;
     }
 
     /**
-     * Constructor, load data into itself from config
+     *
+     */
+    private function __construct()
+    {
+        $this->container = new stdClass();
+    }
+
+    /**
+     * @param string $config_file
+     * @return void
      * @throws ConfigException
      */
-    private function __construct($config_dir)
+    public function loadConfigFile($config_file)
     {
-        if (!file_exists($config_dir . '/main.php')) {
-            throw new ConfigException("Configuration file is missing: '" . ($config_dir . '/main.php') . "'", 500);
-        }
+        $index_for_config_file = md5($config_file);
+        if (!isset($this->loaded_storage[$index_for_config_file])) {
 
-        $config = require $config_dir . '/main.php';
-        $this->container = new stdClass();
-        foreach ($config as $k=>$v) {
-            $this->container->$k = $v;
+            if (!file_exists($config_file)) {
+                throw new ConfigException("Configuration file '{$config_file}' doesn't exist", 500);
+            }
+
+            $config = require($config_file);
+            foreach ($config as $k => $v) {
+                $this->container->$k = $v;
+            }
+            $this->loaded_storage[$index_for_config_file] = $config_file;
         }
     }
 
