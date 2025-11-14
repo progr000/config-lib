@@ -8,7 +8,7 @@ if (!function_exists('config')) {
      */
     function config($key = null, $default = null)
     {
-        $config = Maksym\Config\ConfigDriver::getInstance("");
+        $config = Maksym\Config\ConfigDriver::getInstance();
 
         if (is_null($key)) {
             return $config;
