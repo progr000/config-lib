@@ -53,6 +53,10 @@ class ConfigDriver
                 throw new ConfigException("Configuration file '{$config_file}' doesn't exist", 500);
             }
 
+            if (!is_file($config_file) || !is_readable($config_file)) {
+                throw new ConfigException("Configuration file '{$config_file}' is not a file or not readable file", 500);
+            }
+
             $config = require($config_file);
             foreach ($config as $k => $v) {
                 $this->container->$k = $v;
