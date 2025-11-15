@@ -4,9 +4,25 @@ namespace Tests;
 
 use Maksym\Config\ConfigException;
 use Maksym\Config\ConfigDriver;
+use PHPUnit\Framework\TestCase;
 
-class ConfigDriverTest extends _BaseTestCase
+class ConfigDriverTest extends TestCase
 {
+    protected static $config_instance;
+
+    /**
+     * @return void
+     */
+    public function testGetInstanceFail()
+    {
+        try {
+            self::$config_instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . "../src/not-exist.php");
+            $this->assertInstanceOf('Maksym\Config\ConfigDriver', self::$config_instance);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Maksym\Config\ConfigException', $e);
+            $this->assertContains("doesn't exist", $e->getMessage());
+        }
+    }
 
     /**
      * @return void
@@ -14,8 +30,21 @@ class ConfigDriverTest extends _BaseTestCase
      */
     public function testGetInstance()
     {
-        $instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . "config/main.php");
-        $this->assertInstanceOf('Maksym\Config\ConfigDriver', $instance);
+        self::$config_instance = ConfigDriver::getInstance(__DIR__ . DIRECTORY_SEPARATOR . "../src/config-example.php");
+        $this->assertInstanceOf('Maksym\Config\ConfigDriver', self::$config_instance);
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoadConfigFileFailOnDir()
+    {
+        try {
+            self::$config_instance->loadConfigFile(__DIR__ . DIRECTORY_SEPARATOR . "../src");
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Maksym\Config\ConfigException', $e);
+            $this->assertContains("is not a file or not readable file", $e->getMessage());
+        }
     }
 
     /**
@@ -30,7 +59,25 @@ class ConfigDriverTest extends _BaseTestCase
     /**
      * @return void
      */
-    public function testGetNonExisted()
+    public function testGetExistedSecondLevel()
+    {
+        $val = self::$config_instance->get('caching->driver');
+        $this->assertEquals('file', $val);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetNotExistedSecondLevel()
+    {
+        $val = self::$config_instance->get('caching->driver2');
+        $this->assertNull($val);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetNotExisted()
     {
         $val = self::$config_instance->get('test-param-non-exist');
         $this->assertEquals(null, $val);
@@ -39,7 +86,7 @@ class ConfigDriverTest extends _BaseTestCase
     /**
      * @return void
      */
-    public function testGetNonExistedButDefaultValue()
+    public function testGetNotExistedButDefaultValue()
     {
         $val = self::$config_instance->get('test-param-non-exist', 111);
         $this->assertEquals(111, $val);

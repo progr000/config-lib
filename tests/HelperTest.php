@@ -3,8 +3,9 @@
 namespace Tests;
 
 use Maksym\Config\ConfigException;
+use PHPUnit\Framework\TestCase;
 
-class HelperTest extends _BaseTestCase
+class HelperTest extends TestCase
 {
     /**
      * @return void
