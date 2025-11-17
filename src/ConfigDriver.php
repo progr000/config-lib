@@ -46,7 +46,7 @@ class ConfigDriver
      */
     public function loadConfigFile($config_file)
     {
-        $index_for_config_file = md5($config_file);
+        $index_for_config_file = md5(realpath($config_file));
         if (!isset($this->loaded_storage[$index_for_config_file])) {
 
             if (!file_exists($config_file)) {
